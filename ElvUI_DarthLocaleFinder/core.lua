@@ -5,10 +5,11 @@ local EP = LibStub("LibElvUIPlugin-1.0")
 
 _G[AddOnName] = Engine;
 
-local upper = upper
+local upper, match = upper, match
 local type, pairs = type, pairs
 
 local missingLocCounters = {
+	["enUS"] = 0,
 	["deDE"] = 0,
 	["esMX"] = 0,
 	["frFR"] = 0,
@@ -41,13 +42,13 @@ local function CreateTabs()
 	end
 end
 
-local function CreateMissingLocales(loc, line)
-	local translation = type(E.Libs.ACL.apps["ElvUI"][loc][line]) == "table" and "|cffD3CF00This is a table of translations. See the file in question to compare|r" or E.Libs.ACL.apps["ElvUI"][loc][line]
-	E.Options.args.DarthLocaleFinder.args.missingTab.args["Tab_"..loc].args[line] ={
+local function CreateMissingLocales(parsedLocale, line)
+	local translation = type(E.Libs.ACL.apps["ElvUI"][parsedLocale][line]) == "table" and "|cffD3CF00This is a table of translations. See the file in question to compare|r" or E.Libs.ACL.apps["ElvUI"][parsedLocale][line]
+	E.Options.args.DarthLocaleFinder.args.missingTab.args["Tab_"..parsedLocale].args[line] ={
 		type = "group",
 		order = 10,
 		name = line,
-		guiInline = true,
+		-- guiInline = true,
 		args = {
 			original = {
 				type = "input",
@@ -70,8 +71,31 @@ local function CreateMissingLocales(loc, line)
 	}
 end
 
+local function ClearMissingCounters()
+	for loc, missing in pairs(missingLocCounters) do
+		missingLocCounters[loc] = 0
+	end
+end
+
+local function IsLineMissing(parsedLocale, line)
+	if parsedLocale ~= "enUS" and E.Libs.ACL.apps["ElvUI"][parsedLocale][line] == line then
+		return true
+	elseif ((L == EngLocale or parsedLocale == "enUS") and E.Libs.ACL.elvUIMissingLines[line]) then
+		return true
+	else
+		return false
+	end
+end
+
 local function BuildTableList()
-	for line, translation in pairs(E.Libs.ACL.apps["ElvUI"]["enUS"]) do
+	local EngLocale = E.Libs.ACL:GetLocale("ElvUI", "enUS")
+	ClearMissingCounters()
+	E.Options.args.DarthLocaleFinder.args.missingInfoLine.name = "Missing lines in..."
+	-- print(ActualLocale["Condensed (Spaced)"])
+	-- for line, translation in pairs(EngLocale) do
+	-- print(L == E.Libs.ACL.apps["ElvUI"]["enUS"])
+	-- print(GetLocale())
+	for line, translation in pairs(L) do
 		local first = line:match("^.?[\128-\191]*"):upper()
 		local tabName = E.Options.args.DarthLocaleFinder.args.localesTab.args["Tab_"..first] and "Tab_"..first or "Tab_!"
 		local forcedWarning = false
@@ -80,32 +104,41 @@ local function BuildTableList()
 			name = line,
 			args = {},
 		}
-		if type(translation) == "table" then forcedWarning = true; translation = "|cffD3CF00This is a table of translations. See the file in question to compare|r" end
-		E.Options.args.DarthLocaleFinder.args.localesTab.args[tabName].args[line].args.enUS = {
+		if type(translation) == "table" then
+			forcedWarning = true;
+			translation = "|cffD3CF00This is a table of translations. See the file in question to compare|r"
+		end
+		E.Options.args.DarthLocaleFinder.args.localesTab.args[tabName].args[line].args.supposedToBe = {
 			type = "input",
 			order = 1,
-			name = 'English',
+			name = 'As seen in code',
 			width = "full",
 			get = function() return translation end,
 			set = function() end,
 		}
-		for loc, missing in pairs(missingLocCounters) do
-			E.Options.args.DarthLocaleFinder.args.localesTab.args[tabName].args[line].args[loc] = {
+		for parsedLocale, missing in pairs(missingLocCounters) do
+			E.Options.args.DarthLocaleFinder.args.localesTab.args[tabName].args[line].args[parsedLocale] = {
 				type = "input",
 				order = 10,
-				name = loc,
+				name = parsedLocale,
 				width = "full",
-				get = function() return E.Libs.ACL.apps["ElvUI"][loc][line] end,
+				get = function() return E.Libs.ACL.apps["ElvUI"][parsedLocale][line] end,
 				set = function() end,
 			}
-			if E.Libs.ACL.apps["ElvUI"][loc][line] == E.Libs.ACL.apps["ElvUI"]["enUS"][line] or forcedWarning then
-				missingLocCounters[loc] = missing + 1
-				CreateMissingLocales(loc, line)
+			-- if L == EngLocale then
+				-- if L[line] == true then print(line) end
+			-- end
+			-- if (loc ~= "enUS" and E.Libs.ACL.apps["ElvUI"][loc][line] == line) or (L ~= EngLocale and EngLocale[line] == L[line]) or forcedWarning then
+			
+			if forcedWarning or IsLineMissing(parsedLocale, line) then
+				missingLocCounters[parsedLocale] = missing + 1
+				CreateMissingLocales(parsedLocale, line)
 			end
 		end
 	end
+	
 	for loc, missing in pairs(missingLocCounters) do
-		local color = missing > 100 and "E30000" or missing > 5 and "D3CF00" or "00ff00"
+		local color = missing > 100 and "E30000" or missing > 5 and "D3CF00" or "00FF00"
 		E.Options.args.DarthLocaleFinder.args.missingInfoLine.name = E.Options.args.DarthLocaleFinder.args.missingInfoLine.name.." "..loc..": |cff"..color..missing.."|r;"
 	end
 end
