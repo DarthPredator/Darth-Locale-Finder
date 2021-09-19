@@ -1,7 +1,7 @@
-## Interface: 80300
+## Interface: 90100
 ## Title: |cff1784d1ElvUI|r |cff9482c9Darth's|r Locale Finder
 ## Author: Darth Predator
-## Version: 0.01
+## Version: 1.00
 ## Notes: Evil Overlord Control Panel
 ## RequiredDeps: ElvUI
 ## DefaultState: Enabled
