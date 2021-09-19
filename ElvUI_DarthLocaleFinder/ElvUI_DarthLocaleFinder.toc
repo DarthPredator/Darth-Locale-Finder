@@ -1,0 +1,9 @@
+## Interface: 80300
+## Title: |cff1784d1ElvUI|r |cff9482c9Darth's|r Locale Finder
+## Author: Darth Predator
+## Version: 0.01
+## Notes: Evil Overlord Control Panel
+## RequiredDeps: ElvUI
+## DefaultState: Enabled
+
+core.lua
