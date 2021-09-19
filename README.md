@@ -10,4 +10,4 @@ That will populate all the sections with the current version of locales from bot
 "Locales" tab has all the lines split alphabetically just so you can see and compare stuff.
 
 # Warning
-Trying to open the missing tab for a locale with too much lines can result in game freezing and possibly crushing
+Trying to open the missing tab for a locale with too much lines can result in game freezing and possibly crashing
