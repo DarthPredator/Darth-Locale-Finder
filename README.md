@@ -8,3 +8,6 @@ That will populate all the sections with the current version of locales from bot
 "Missing" tab will give you the rundown of all the lines missing from locales split into separate tabs for each locale.
 
 "Locales" tab has all the lines split alphabetically just so you can see and compare stuff.
+
+# Warning
+Trying to open the missing tab for a locale with too much lines can result in game freezing and possibly crushing
