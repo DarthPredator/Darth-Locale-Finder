@@ -48,7 +48,6 @@ local function CreateMissingLocales(parsedLocale, line)
 		type = "group",
 		order = 10,
 		name = line,
-		-- guiInline = true,
 		args = {
 			original = {
 				type = "input",
@@ -91,10 +90,6 @@ local function BuildTableList()
 	local EngLocale = E.Libs.ACL:GetLocale("ElvUI", "enUS")
 	ClearMissingCounters()
 	E.Options.args.DarthLocaleFinder.args.missingInfoLine.name = "Missing lines in..."
-	-- print(ActualLocale["Condensed (Spaced)"])
-	-- for line, translation in pairs(EngLocale) do
-	-- print(L == E.Libs.ACL.apps["ElvUI"]["enUS"])
-	-- print(GetLocale())
 	for line, translation in pairs(L) do
 		local first = line:match("^.?[\128-\191]*"):upper()
 		local tabName = E.Options.args.DarthLocaleFinder.args.localesTab.args["Tab_"..first] and "Tab_"..first or "Tab_!"
@@ -125,11 +120,7 @@ local function BuildTableList()
 				get = function() return E.Libs.ACL.apps["ElvUI"][parsedLocale][line] end,
 				set = function() end,
 			}
-			-- if L == EngLocale then
-				-- if L[line] == true then print(line) end
-			-- end
-			-- if (loc ~= "enUS" and E.Libs.ACL.apps["ElvUI"][loc][line] == line) or (L ~= EngLocale and EngLocale[line] == L[line]) or forcedWarning then
-			
+
 			if forcedWarning or IsLineMissing(parsedLocale, line) then
 				missingLocCounters[parsedLocale] = missing + 1
 				CreateMissingLocales(parsedLocale, line)
